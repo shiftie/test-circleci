@@ -43,14 +43,23 @@ jobs:
       - run: yarn test
 
   generateA:
+    docker:
+      - image: circleci/node:8.9.4
+
     steps:
       - run: node scripts/create.js --target=a
 
   generateB:
+    docker:
+      - image: circleci/node:8.9.4
+
     steps:
       - run: node scripts/create.js --target=b
 
   list:
+    docker:
+      - image: circleci/node:8.9.4
+
     steps:
       - run: node scripts/create.js
 
