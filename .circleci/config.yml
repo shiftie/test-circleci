@@ -16,6 +16,9 @@ jobs:
 
     working_directory: ~/repo
 
+    environment:
+      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
+
     steps:
       - checkout
 
@@ -44,10 +47,23 @@ jobs:
 
 workflows:
   version: 2
-  nightly:
+  hourly:
     triggers:
       - schedule:
-          cron: "* * * * *"
+          # 9AM - 5PM FR time
+          cron: "1/5 1-9 * * 1-5"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build
+
+  daily:
+    triggers:
+      - schedule:
+          # Every day 3AM FR time
+          cron: "0 19 * * 1-5"
           filters:
             branches:
               only:
