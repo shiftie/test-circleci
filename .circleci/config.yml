@@ -15,7 +15,7 @@ jobs:
       # - image: circleci/redis:latest
     working_directory: ~/repo
     hosts:
-      www.zendesk.com: 127.0.0.1
+      - www.zendesk.com: 127.0.0.1
     steps:
       - checkout
       - run: ping www.zendesk.com -t 1
