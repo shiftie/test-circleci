@@ -4,7 +4,7 @@
 #
 version: 2
 jobs:
-  build:
+  bootstrap:
     docker:
       # specify the version you desire here
       - image: circleci/node:8.9.4-browsers
@@ -15,9 +15,6 @@ jobs:
       - image: circleci/redis:latest
 
     working_directory: ~/repo
-
-    environment:
-      TZ: "/usr/share/zoneinfo/America/Los_Angeles"
 
     steps:
       - checkout
@@ -45,44 +42,70 @@ jobs:
       # run tests!
       - run: yarn test
 
+  generateA:
+    steps:
+      - run: node scripts/create.js --target=a
+
+  generateB:
+    steps:
+      - run: node scripts/create.js --target=b
+
+  list:
+    steps:
+      - run: node scripts/create.js
+
+
 workflows:
   version: 2
-  hourly-AM:
-    triggers:
-      - schedule:
-          # LA working hours: 8.59-11.59 weekdays
-          # cron: "59 15-18 * * 1-5"
-          # UTC time
-          cron: "59 7-10 * * 1-5"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - build
+  # hourly-AM:
+  #   triggers:
+  #     - schedule:
+  #         # LA working hours: 8.59-11.59 weekdays
+  #         # cron: "59 15-18 * * 1-5"
+  #         # UTC time
+  #         cron: "59 7-10 * * 1-5"
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
+  #   jobs:
+  #     - build
 
-  hourly-PM:
-    triggers:
-      - schedule:
-          # LA working hours: 13.59-16.59 weekdays
-          # cron: "59 20-23 * * 1-5"
-          # UTC time
-          cron: "59 12-16 * * 1-5"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - build
+  # hourly-PM:
+  #   triggers:
+  #     - schedule:
+  #         # LA working hours: 13.59-16.59 weekdays
+  #         # cron: "59 20-23 * * 1-5"
+  #         # UTC time
+  #         cron: "59 12-16 * * 1-5"
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
+  #   jobs:
+  #     - build
 
-  daily:
-    triggers:
-      - schedule:
-          # UTC time, matches 3AM weekdays LA time
-          cron: "0 10 * * 1-5"
-          filters:
-            branches:
-              only:
-                - master
+  # daily:
+  #   triggers:
+  #     - schedule:
+  #         # UTC time, matches 3AM weekdays LA time
+  #         cron: "0 10 * * 1-5"
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
+  #   jobs:
+  #     - build
+  generate-and-list:
     jobs:
-      - build
+      - bootstrap
+      - generateA:
+          requires:
+            - bootstrap
+      - generateB:
+        requires:
+          - bootstrap
+      - list:
+        requires:
+          - generateA
+          - generateB
