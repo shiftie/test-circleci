@@ -12,7 +12,7 @@ jobs:
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      - image: circleci/redis:latest
+      # - image: circleci/redis:latest
 
     working_directory: ~/repo
 
@@ -39,8 +39,10 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      # run tests!
-      - run: yarn test
+      - persist_to_workspace:
+          root: .
+          paths:
+            - node_modules
 
   generateA:
     docker:
@@ -48,16 +50,8 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-      - run: yarn install
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+      - attach_workspace:
+          at: .
       - run: node scripts/create.js --target=a
       - persist_to_workspace:
           root: .
@@ -70,16 +64,8 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-      - run: yarn install
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+      - attach_workspace:
+          at: .
       - run: node scripts/create.js --target=b
       - persist_to_workspace:
           root: .
@@ -92,16 +78,6 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-      - run: yarn install
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
       - attach_workspace:
           at: .
       - run: node scripts/create.js
@@ -150,7 +126,11 @@ workflows:
   generate-and-list:
     jobs:
       - generateA
+        requires:
+          - bootstrap
       - generateB
+          requires:
+            - bootstrap
       - list:
           requires:
             - generateA
