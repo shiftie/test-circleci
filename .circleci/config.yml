@@ -126,8 +126,8 @@ workflows:
   generate-and-list:
     jobs:
       - generateA
-        requires:
-          - bootstrap
+          requires:
+            - bootstrap
       - generateB
           requires:
             - bootstrap
