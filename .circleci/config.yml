@@ -125,10 +125,10 @@ workflows:
   #     - build
   generate-and-list:
     jobs:
-      - generateA
+      - generateA:
           requires:
             - bootstrap
-      - generateB
+      - generateB:
           requires:
             - bootstrap
       - list:
