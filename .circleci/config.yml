@@ -50,8 +50,10 @@ workflows:
   hourly:
     triggers:
       - schedule:
+          # LA working hours: 8.59-11.59 then 13.59-16.59 weekdays
+          # cron: "59 15-18,20-23 * * 1-5"
           # UTC time
-          cron: "10,15,20,25,30 8-16 * * 1-5"
+          cron: "59 8-11,13-16 * * 1-5"
           filters:
             branches:
               only:
@@ -62,8 +64,8 @@ workflows:
   daily:
     triggers:
       - schedule:
-          # UTC time
-          cron: "0 2 * * 1-5"
+          # UTC time, matches 3AM weekdays LA time
+          cron: "0 10 * * 1-5"
           filters:
             branches:
               only:
