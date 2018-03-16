@@ -59,6 +59,10 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: node scripts/create.js --target=a
+      - persist_to_workspace:
+          root: dist
+          paths:
+            - *
 
   generateB:
     docker:
@@ -77,6 +81,10 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: node scripts/create.js --target=b
+      - persist_to_workspace:
+          root: dist
+          paths:
+            - *
 
   list:
     docker:
@@ -94,6 +102,8 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
+      - attach_workspace:
+          at: dist
       - run: node scripts/create.js
 
 workflows:
