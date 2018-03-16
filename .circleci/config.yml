@@ -28,9 +28,9 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
 
       - run: yarn install
 
@@ -45,24 +45,53 @@ jobs:
   generateA:
     docker:
       - image: circleci/node:8.9.4
-
+    working_directory: ~/repo
     steps:
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
       - run: node scripts/create.js --target=a
 
   generateB:
     docker:
       - image: circleci/node:8.9.4
-
+    working_directory: ~/repo
     steps:
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
       - run: node scripts/create.js --target=b
 
   list:
     docker:
       - image: circleci/node:8.9.4
-
+    working_directory: ~/repo
     steps:
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
       - run: node scripts/create.js
-
 
 workflows:
   version: 2
@@ -107,13 +136,8 @@ workflows:
   #     - build
   generate-and-list:
     jobs:
-      - bootstrap
-      - generateA:
-          requires:
-            - bootstrap
-      - generateB:
-          requires:
-            - bootstrap
+      - generateA
+      - generateB
       - list:
           requires:
             - generateA
