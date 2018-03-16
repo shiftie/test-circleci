@@ -125,6 +125,7 @@ workflows:
   #     - build
   generate-and-list:
     jobs:
+      - bootstrap
       - generateA:
           requires:
             - bootstrap
