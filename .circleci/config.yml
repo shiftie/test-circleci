@@ -133,7 +133,6 @@ workflows:
                 - master
     jobs:
       - bootstrap
-      - test
       - generateA:
           requires:
             - bootstrap
@@ -158,6 +157,7 @@ workflows:
   #     - build
   generate-and-list:
     jobs:
+      - test
       - bootstrap:
           filters:
             branches:
