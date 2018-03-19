@@ -67,6 +67,7 @@ jobs:
     parallelism: 3
     steps:
       - checkout
+      - echo ${WOOT}
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
