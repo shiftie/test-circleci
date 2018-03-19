@@ -75,6 +75,11 @@ jobs:
 
 workflows:
   version: 2
+  # TODO: - check if schduled build start before timer after a push
+  #       - check if custom branches workflows can be triggered by
+  #         duplicating hourly workflow without shedule
+  #         but adding cutom branch name to filters
+  #
   # hourly-AM:
   #   triggers:
   #     - schedule:
@@ -116,7 +121,10 @@ workflows:
   #     - build
   generate-and-list:
     jobs:
-      - bootstrap
+      - bootstrap:
+          filters:
+            branches:
+              only: /mp$/
       - generateA:
           requires:
             - bootstrap
