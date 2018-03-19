@@ -133,6 +133,7 @@ workflows:
                 - master
     jobs:
       - bootstrap
+      - test
       - generateA:
           requires:
             - bootstrap
