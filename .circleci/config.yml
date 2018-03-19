@@ -39,7 +39,7 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
-      - run: node scripts/create.js --target=a
+      - run: TESTFILES=$(circleci tests "a b" | circleci tests split --split-by=timings) && node scripts/create.js --target=${TESTFILES}
       - persist_to_workspace:
           root: .
           paths:
