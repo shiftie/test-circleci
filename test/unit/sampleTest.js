@@ -3,6 +3,7 @@
 const argv = require('yargs').argv;
 const Nightmare = require('nightmare');
 const nightmare = Nightmare({ show: true });
+const expect = require('chai').expect;
 const parallel = require('mocha.parallel');
 const parallelize = argv.parallel !== undefined ? argv.parallel : false;
 
@@ -35,10 +36,15 @@ describe('Demo flows', function() {
               .end()
               .then(link => {
                 console.log(link);
+                if (flow === 'zendesk') {
+                  expect(link, `erm`).to.equal('https://www.zendesk.fr/');
+                }
                 done();
               })
               .catch(error => {
                 console.error('Search failed:', error);
+                nightmare.end();
+                done(new Error(error));
               });
           })();
         });
