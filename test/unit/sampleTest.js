@@ -36,9 +36,6 @@ describe('Demo flows', function() {
               .end()
               .then(link => {
                 console.log(link);
-                if (flow === 'zendesk') {
-                  expect(link, `erm`).to.equal('https://www.zendesk.fr/');
-                }
                 done();
               })
               .catch(error => {
