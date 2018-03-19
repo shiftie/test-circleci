@@ -34,12 +34,14 @@ jobs:
     docker:
       - image: circleci/node:8.9.4
     working_directory: ~/repo
+    parallelism: 3
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
-      - run: TESTFILES=$(circleci tests "a b" | circleci tests split --split-by=timings) && node scripts/create.js --target=${TESTFILES}
+      - run: node scripts/create.js --target=a
+      - run: node scripts/create.js --target=b
       - persist_to_workspace:
           root: .
           paths:
@@ -67,7 +69,6 @@ jobs:
     parallelism: 3
     steps:
       - checkout
-      - run: echo ${WOOT}
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
