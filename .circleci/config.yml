@@ -54,7 +54,7 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
-      - run: node scripts/create.js --target=b
+      - run: node scripts/create.js --target=bz
       - persist_to_workspace:
           root: .
           paths:

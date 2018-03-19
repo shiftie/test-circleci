@@ -7,9 +7,13 @@ const argv = require('yargs').argv;
 const distFolder = `dist`;
 
 if (!argv.target) {
-  console.log(glob.sync(`${distFolder}/**/*.txt`));
+  console.log(glob.sync(`${distFolder}/**/*.html`));
 } else {
+  if (argv.target === 'bz') {
+    throw new Error('woops');
+  }
   mkdirp.sync(distFolder);
+  const content = fs.writeFileSync;
   fs.writeFileSync(
     `${distFolder}/${argv.target}.txt`,
     `file ${argv.target}`,
