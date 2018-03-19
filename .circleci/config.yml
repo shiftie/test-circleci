@@ -92,12 +92,7 @@ workflows:
               only:
                 - master
     jobs:
-      - bootstrap:
-          filters:
-            branches:
-              only:
-                - master
-                - /.*mp$/
+      - bootstrap
       - generateA:
           requires:
             - bootstrap
@@ -108,10 +103,6 @@ workflows:
           requires:
             - generateA
             - generateB
-          filters:
-            branches:
-              only:
-                - master
 
   hourly-PM:
     triggers:
@@ -124,6 +115,31 @@ workflows:
             branches:
               only:
                 - master
+    jobs:
+      - bootstrap
+      - generateA:
+          requires:
+            - bootstrap
+      - generateB:
+          requires:
+            - bootstrap
+      - list:
+          requires:
+            - generateA
+            - generateB
+
+  # daily:
+  #   triggers:
+  #     - schedule:
+  #         # UTC time, matches 3AM weekdays LA time
+  #         cron: "0 10 * * 1-5"
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
+  #   jobs:
+  #     - build
+  generate-and-list:
     jobs:
       - bootstrap:
           filters:
@@ -145,37 +161,3 @@ workflows:
             branches:
               only:
                 - master
-
-  # daily:
-  #   triggers:
-  #     - schedule:
-  #         # UTC time, matches 3AM weekdays LA time
-  #         cron: "0 10 * * 1-5"
-  #         filters:
-  #           branches:
-  #             only:
-  #               - master
-  #   jobs:
-  #     - build
-  # generate-and-list:
-  #   jobs:
-  #     - bootstrap:
-  #         filters:
-  #           branches:
-  #             only:
-  #               - master
-  #               - /.*mp$/
-  #     - generateA:
-  #         requires:
-  #           - bootstrap
-  #     - generateB:
-  #         requires:
-  #           - bootstrap
-  #     - list:
-  #         requires:
-  #           - generateA
-  #           - generateB
-  #         filters:
-  #           branches:
-  #             only:
-  #               - master
