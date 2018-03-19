@@ -137,6 +137,7 @@
     "test-single": "NODE_ENV=test mocha",
     "precommit": "lint-staged",
     "test": "NODE_ENV=test mocha test/unit",
+    "t": "NODE_ENV=test mocha",
     "ci": "NODE_ENV=test mocha -b --retries 2 test/unit test/acceptance",
     "demoTest": "mocha -b test/acceptance/demoTest.js",
     "unit": "NODE_ENV=test mocha test/unit",
