@@ -41,7 +41,6 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
       - run: node scripts/create.js --target=a
-      - run: node scripts/create.js --target=b
       - persist_to_workspace:
           root: .
           paths:
@@ -64,7 +63,7 @@ jobs:
 
   test:
     docker:
-      - image: circleci/node:8.9.4
+      - image: circleci/node:8.9.4-browsers
     working_directory: ~/repo
     parallelism: 3
     steps:
