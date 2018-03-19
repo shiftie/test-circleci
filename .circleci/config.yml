@@ -80,33 +80,71 @@ workflows:
   #         duplicating hourly workflow without shedule
   #         but adding cutom branch name to filters
   #
-  # hourly-AM:
-  #   triggers:
-  #     - schedule:
-  #         # LA working hours: 8.59-11.59 weekdays
-  #         # cron: "59 15-18 * * 1-5"
-  #         # UTC time
-  #         cron: "59 7-10 * * 1-5"
-  #         filters:
-  #           branches:
-  #             only:
-  #               - master
-  #   jobs:
-  #     - build
+  hourly-AM:
+    triggers:
+      - schedule:
+          # LA working hours: 8.59-11.59 weekdays
+          # cron: "59 15-18 * * 1-5"
+          # UTC time
+          cron: "59 7-10 * * 1-5"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - bootstrap:
+          filters:
+            branches:
+              only:
+                - master
+                - /.*mp$/
+      - generateA:
+          requires:
+            - bootstrap
+      - generateB:
+          requires:
+            - bootstrap
+      - list:
+          requires:
+            - generateA
+            - generateB
+          filters:
+            branches:
+              only:
+                - master
 
-  # hourly-PM:
-  #   triggers:
-  #     - schedule:
-  #         # LA working hours: 13.59-16.59 weekdays
-  #         # cron: "59 20-23 * * 1-5"
-  #         # UTC time
-  #         cron: "59 12-16 * * 1-5"
-  #         filters:
-  #           branches:
-  #             only:
-  #               - master
-  #   jobs:
-  #     - build
+  hourly-PM:
+    triggers:
+      - schedule:
+          # LA working hours: 13.59-16.59 weekdays
+          # cron: "59 20-23 * * 1-5"
+          # UTC time
+          cron: "59 12-16 * * 1-5"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - bootstrap:
+          filters:
+            branches:
+              only:
+                - master
+                - /.*mp$/
+      - generateA:
+          requires:
+            - bootstrap
+      - generateB:
+          requires:
+            - bootstrap
+      - list:
+          requires:
+            - generateA
+            - generateB
+          filters:
+            branches:
+              only:
+                - master
 
   # daily:
   #   triggers:
@@ -119,19 +157,25 @@ workflows:
   #               - master
   #   jobs:
   #     - build
-  generate-and-list:
-    jobs:
-      - bootstrap:
-          filters:
-            branches:
-              only: /.*mp$/
-      - generateA:
-          requires:
-            - bootstrap
-      - generateB:
-          requires:
-            - bootstrap
-      - list:
-          requires:
-            - generateA
-            - generateB
+  # generate-and-list:
+  #   jobs:
+  #     - bootstrap:
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
+  #               - /.*mp$/
+  #     - generateA:
+  #         requires:
+  #           - bootstrap
+  #     - generateB:
+  #         requires:
+  #           - bootstrap
+  #     - list:
+  #         requires:
+  #           - generateA
+  #           - generateB
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
