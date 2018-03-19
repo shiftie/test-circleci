@@ -124,7 +124,7 @@ workflows:
       - bootstrap:
           filters:
             branches:
-              only: /mp$/
+              only: /.*mp$/
       - generateA:
           requires:
             - bootstrap
