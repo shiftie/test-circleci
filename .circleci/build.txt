@@ -1,2 +1,3 @@
 node scripts/create.js --target=a
 node scripts/create.js --target=b
+node scripts/create.js --target=c
