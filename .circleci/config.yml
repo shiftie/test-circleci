@@ -79,8 +79,8 @@ jobs:
           name: Tests unit
           command: TESTFILES=$(circleci tests glob "test/unit/**/*.js") && yarn run t ${TESTFILES}
       - run:
-        name: Tests acceptance
-        command: TESTFILES=$(circleci tests glob "test/acceptance/**/*.js" | circleci tests split --split-by=timings) && yarn run t ${TESTFILES} --parallel
+          name: Tests acceptance
+          command: TESTFILES=$(circleci tests glob "test/acceptance/**/*.js" | circleci tests split --split-by=timings) && yarn run t ${TESTFILES} --parallel
       - store_test_results:
           path: /tmp/test-results
 
