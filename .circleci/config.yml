@@ -40,7 +40,7 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
-      - run: node scripts/create.js --target=a
+      - run: TESTFILES=$(circleci tests split .circleci/build.txt) && ${TESTFILES}
       - persist_to_workspace:
           root: .
           paths:
@@ -169,13 +169,13 @@ workflows:
       - generateA:
           requires:
             - bootstrap
-      - generateB:
-          requires:
-            - bootstrap
+      # - generateB:
+      #     requires:
+      #       - bootstrap
       - list:
           requires:
             - generateA
-            - generateB
+            # - generateB
           filters:
             branches:
               only:

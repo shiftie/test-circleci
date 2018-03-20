@@ -1,0 +1,2 @@
+node scripts/create.js --target=a
+node scripts/create.js --target=b
