@@ -46,7 +46,7 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
       - attach_workspace:
-        at: .
+          at: .
       - run: case $CIRCLE_NODE_INDEX in 0) node scripts/generateTasks.js ;; esac
       - run: TESTFILES=$(circleci tests split .circleci/build.txt) && ${TESTFILES}
       # - run: TESTFILES=$(circleci tests split .circleci/build.txt) && ${TESTFILES}
