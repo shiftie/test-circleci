@@ -25,10 +25,15 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
       - run: yarn install
+      - run: case $CIRCLE_NODE_INDEX in 0) node scripts/generateTasks.js ;; esac
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
+      - persist_to_workspace:
+        root: .
+        paths:
+          - .circleci
 
   generateA:
     docker:
@@ -40,6 +45,8 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
+      - attach_workspace:
+        at: .
       - run: case $CIRCLE_NODE_INDEX in 0) node scripts/generateTasks.js ;; esac
       - run: TESTFILES=$(circleci tests split .circleci/build.txt) && ${TESTFILES}
       # - run: TESTFILES=$(circleci tests split .circleci/build.txt) && ${TESTFILES}
@@ -77,7 +84,7 @@ jobs:
       - run: mkdir -p /tmp/test-results
       - run:
           name: Tests unit
-          command: TESTFILES=$(circleci tests glob "test/unit/**/*.js") && yarn run t ${TESTFILES}
+          command: case $CIRCLE_NODE_INDEX in 0) TESTFILES=$(circleci tests glob "test/unit/**/*.js") && yarn run t ${TESTFILES} ;; esac
       - run:
           name: Tests acceptance
           command: TESTFILES=$(circleci tests glob "test/acceptance/**/*.js" | circleci tests split --split-by=timings) && yarn run t ${TESTFILES} --parallel
