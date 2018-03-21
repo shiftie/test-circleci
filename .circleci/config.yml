@@ -55,7 +55,7 @@ jobs:
             - v1-dependencies-{{ checksum "package.json" }}
       - attach_workspace:
           at: .
-      - run: TESTFILES=$(circleci tests split .circleci/build.txt) && ${TESTFILES}
+      - run: TESTFILES=$(circleci tests split .circleci/build.txt) && ${TESTFILES} $BUILD_PARAMS
       # - run: TESTFILES=$(circleci tests split .circleci/build.txt) && ${TESTFILES}
       # - run: TESTFILES=$(circleci tests split "node scripts/create.js --target=a" "node scripts/create.js --target=b" "node scripts/create.js --target=c") && ${TESTFILES}
       - persist_to_workspace:
@@ -188,7 +188,7 @@ workflows:
                 - master
                 - /.*mp$/
       - generateA:
-          context: mirror
+          context: prod
           requires:
             - bootstrap
       # - generateB:
