@@ -23,6 +23,7 @@ jobs:
       - run:
           shell: /bin/bash
           command: |
+            echo $FOO
             echo Running LOL
             set +e
             set +o pipefail
@@ -180,6 +181,8 @@ workflows:
     jobs:
       - test
       - bootstrap:
+          environment:
+            - FOO: yolo
           filters:
             branches:
               only:
