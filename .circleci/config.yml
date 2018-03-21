@@ -24,7 +24,7 @@ jobs:
           command: |
             echo Running LOL
             set +e
-            mkdir /tmp/gg/lol
+            mkdir /tmp/gg/lol && true
       # Download and cache dependencies
       - restore_cache:
           keys:
