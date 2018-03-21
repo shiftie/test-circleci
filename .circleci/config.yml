@@ -15,6 +15,7 @@ jobs:
       # - image: circleci/redis:latest
     working_directory: ~/repo
     steps:
+      - run: if [ "$CIRCLE_WORKFLOW_ID" = "5fb8777f-2868-4914-91ec-9878dd08139e"  ]; then export FOO="yolo" ; fi
       - checkout
       - run: echo 127.0.0.1 www.zendesk.com | sudo tee -a /etc/hosts
       - run: sudo apt-get update
@@ -181,8 +182,6 @@ workflows:
     jobs:
       - test
       - bootstrap:
-          environment:
-            - FOO: yolo
           filters:
             branches:
               only:
