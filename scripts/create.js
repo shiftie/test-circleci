@@ -6,6 +6,8 @@ const mkdirp = require('mkdirp');
 const argv = require('yargs').argv;
 const distFolder = `dist`;
 
+console.log(argv);
+
 if (!argv.target) {
   console.log(glob.sync(`${distFolder}/**/*.txt`));
 } else {
