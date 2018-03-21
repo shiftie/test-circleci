@@ -188,7 +188,7 @@ workflows:
                 - master
                 - /.*mp$/
       - generateA:
-          # context: mirror
+          context: mirror
           requires:
             - bootstrap
       # - generateB:
