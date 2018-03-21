@@ -24,7 +24,8 @@ jobs:
           command: |
             echo Running LOL
             set +e
-            node scripts/error.js
+            set +o pipefail
+            node scripts/error.js && echo Hey
       # Download and cache dependencies
       - restore_cache:
           keys:
