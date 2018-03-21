@@ -4,5 +4,5 @@ try {
   throw new Error('erm');
 } catch (error) {
   console.log(error);
-  process.exit(1);
+  process.exit();
 }
