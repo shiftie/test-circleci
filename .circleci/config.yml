@@ -4,46 +4,52 @@
 #
 version: 2
 jobs:
+  # bootstrap:
+  #   docker:
+  #     # specify the version you desire here
+  #     - image: circleci/node:8.9.4
+
+  #     # Specify service dependencies here if necessary
+  #     # CircleCI maintains a library of pre-built images
+  #     # documented at https://circleci.com/docs/2.0/circleci-images/
+  #     # - image: circleci/redis:latest
+  #   working_directory: ~/repo
+  #   steps:
+  #     - checkout
+  #     # - run: echo 127.0.0.1 www.zendesk.com | sudo tee -a /etc/hosts
+  #     # - run: sudo apt-get update
+  #     # - run: sudo apt-get install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
+  #     # - run: if [ "$CIRCLE_BRANCH" = "master"  ]; then sudo npm install -g grunt-cli; fi
+  #     # Download and cache dependencies
+  #     - restore_cache:
+  #         keys:
+  #           - v1-dependencies-{{ checksum "package.json" }}
+  #     - run: yarn install
+  #     - run: case $CIRCLE_NODE_INDEX in 0) node scripts/generateTasks.js ;; esac
+  #     - save_cache:
+  #         paths:
+  #           - node_modules
+  #         key: v1-dependencies-{{ checksum "package.json" }}
+  #     - persist_to_workspace:
+  #         root: .
+  #         paths:
+  #           - .circleci
   bootstrap:
     docker:
-      # specify the version you desire here
-      - image: circleci/node:8.9.4-browsers
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/redis:latest
+      - image: circleci/node:8.9.4
     working_directory: ~/repo
     steps:
       - checkout
-      - run: echo 127.0.0.1 www.zendesk.com | sudo tee -a /etc/hosts
-      - run: sudo apt-get update
-      - run: sudo apt-get install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
-      - run: if [ "$CIRCLE_BRANCH" = "master"  ]; then sudo npm install -g grunt-cli; fi
-      - run:
-          shell: /bin/bash
-          command: |
-            echo $BUILD_PARAMS
-            echo Running LOL
-            set +e
-            set +o pipefail
-            node scripts/error.js
-      # Download and cache dependencies
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
       - run: yarn install
-      - run: case $CIRCLE_NODE_INDEX in 0) node scripts/generateTasks.js ;; esac
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .circleci
 
-  generateA:
+  build:
     docker:
       - image: circleci/node:8.9.4
     working_directory: ~/repo
@@ -53,17 +59,16 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
-      - attach_workspace:
-          at: .
-      - run: TESTFILES=$(circleci tests split .circleci/build.txt) && ${TESTFILES} $BUILD_PARAMS
-      # - run: TESTFILES=$(circleci tests split .circleci/build.txt) && ${TESTFILES}
-      # - run: TESTFILES=$(circleci tests split "node scripts/create.js --target=a" "node scripts/create.js --target=b" "node scripts/create.js --target=c") && ${TESTFILES}
+      - run: sudo npm install -g grunt-cli
+      - run: BUILDTASKS=$(circleci tests split .circleci/jobs/build.txt) && ${BUILDTASKS} $BUILD_PARAMS
       - persist_to_workspace:
           root: .
           paths:
-            - dist
+            - public/assets/json/jobs.json
+            - public/assets/json/jobs-search.json
+            - wordpress/wp-content/themes/zendesk-twentyeleven/lib/apps.json
 
-  generateB:
+  generate:
     docker:
       - image: circleci/node:8.9.4
     working_directory: ~/repo
@@ -72,44 +77,48 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
-      - run: node scripts/create.js --target=b
+      - run: node .circleci/scripts/generate.js $BUILD_PARAMS
       - persist_to_workspace:
           root: .
           paths:
-            - dist
+            - public/sites #might improve here if too long
 
   test:
     docker:
       - image: circleci/node:8.9.4-browsers
+      - image: circleci/redis:latest
     working_directory: ~/repo
     parallelism: 3
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
       - run: mkdir -p /tmp/test-results
+      - run: echo 127.0.0.1 www.zendesk.com | sudo tee -a /etc/hosts
       - run:
           name: Tests unit
-          command: case $CIRCLE_NODE_INDEX in 0) TESTFILES=$(circleci tests glob "test/unit/**/*.js") && yarn run t ${TESTFILES} ;; esac
+          command: if [ "$CIRCLE_NODE_INDEX" = 0  ]; then TESTFILES=$(circleci tests glob "test/unit/**/*.js") && yarn run t ${TESTFILES}; fi
       - run:
           name: Tests acceptance
           command: TESTFILES=$(circleci tests glob "test/acceptance/**/*.js" | circleci tests split --split-by=timings) && yarn run t ${TESTFILES} --parallel
       - store_test_results:
           path: /tmp/test-results
 
-  list:
+  deploy:
     docker:
       - image: circleci/node:8.9.4
     working_directory: ~/repo
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
-      - attach_workspace:
-          at: .
-      - run: node scripts/create.js
+      - run: node .circleci/scripts/deploy.js $BUILD_PARAMS
 
 workflows:
   version: 2
@@ -118,53 +127,53 @@ workflows:
   #         duplicating hourly workflow without shedule
   #         but adding cutom branch name to filters
   #
-  hourly-AM:
-    triggers:
-      - schedule:
-          # LA working hours: 8.59-11.59 weekdays
-          # cron: "59 15-18 * * 1-5"
-          # UTC time
-          cron: "59 7-10 * * 1-5"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - bootstrap
-      - generateA:
-          requires:
-            - bootstrap
-      - generateB:
-          requires:
-            - bootstrap
-      - list:
-          requires:
-            - generateA
-            # - generateB
+  # hourly-AM:
+  #   triggers:
+  #     - schedule:
+  #         # LA working hours: 8.59-11.59 weekdays
+  #         # cron: "59 15-18 * * 1-5"
+  #         # UTC time
+  #         cron: "59 7-10 * * 1-5"
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
+  #   jobs:
+  #     - bootstrap
+  #     - generateA:
+  #         requires:
+  #           - bootstrap
+  #     - generateB:
+  #         requires:
+  #           - bootstrap
+  #     - list:
+  #         requires:
+  #           - generateA
+  #           # - generateB
 
-  hourly-PM:
-    triggers:
-      - schedule:
-          # LA working hours: 13.59-16.59 weekdays
-          # cron: "59 20-23 * * 1-5"
-          # UTC time
-          cron: "59 12-16 * * 1-5"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - bootstrap
-      - generateA:
-          requires:
-            - bootstrap
-      - generateB:
-          requires:
-            - bootstrap
-      - list:
-          requires:
-            - generateA
-            # - generateB
+  # hourly-PM:
+  #   triggers:
+  #     - schedule:
+  #         # LA working hours: 13.59-16.59 weekdays
+  #         # cron: "59 20-23 * * 1-5"
+  #         # UTC time
+  #         cron: "59 12-16 * * 1-5"
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
+  #   jobs:
+  #     - bootstrap
+  #     - generateA:
+  #         requires:
+  #           - bootstrap
+  #     - generateB:
+  #         requires:
+  #           - bootstrap
+  #     - list:
+  #         requires:
+  #           - generateA
+  #           # - generateB
 
   # daily:
   #   triggers:
@@ -179,7 +188,6 @@ workflows:
   #     - build
   generate-and-list:
     jobs:
-      - test
       - bootstrap:
           context: mirror
           filters:
@@ -187,19 +195,19 @@ workflows:
               only:
                 - master
                 - /.*mp$/
-      - generateA:
-          context: prod
-          requires:
-            - bootstrap
-      # - generateB:
-      #     requires:
-      #       - bootstrap
-      - list:
+      - build:
           context: mirror
           requires:
-            - generateA
-            # - generateB
-          filters:
-            branches:
-              only:
-                - master
+            - bootstrap
+      - generate:
+          context: mirror
+          requires:
+            - build
+      - tests:
+          context: mirror
+          requires:
+            - generate
+      - deploy:
+          context: mirror
+          requires:
+            - tests
