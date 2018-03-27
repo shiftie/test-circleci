@@ -229,11 +229,11 @@ workflows:
           context: mirror
           requires:
             - build
-      - tests:
+      - test:
           context: mirror
           requires:
             - generate
       - deploy:
           context: mirror
           requires:
-            - tests
+            - test
