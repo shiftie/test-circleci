@@ -8,16 +8,16 @@ node: &node
     - image: circleci/node:8.9.4
   working_directory: ~/repo
 
-flagsz: &flagsz
-  steps:
-    - run: echo gg
-
 version: 2
 jobs:
   bootstrap:
     <<: *node
-    <<: *flagsz
     steps:
+      - run: |
+          if [[ $CIRCLE_BRANCH = *"aster"* ]]; then
+            echo "It's there!"
+            TOTO=tata
+          fi
       - checkout
       - restore_cache:
           keys:
