@@ -9,16 +9,16 @@ aliases:
       - image: circleci/node:8.9.4
     working_directory: ~/repo
   - &flags
-    run:
-      name: Setting build params
-      command: if [[ $CIRCLE_BRANCH = *"ster"* ]]; then TOTO=tata fi
+    - run:
+        name: Setting build params
+        command: if [[ $CIRCLE_BRANCH = *"ster"* ]]; then TOTO=tata fi
 
 version: 2
 jobs:
   bootstrap:
     <<: *node
     steps:
-      # <<: *flags
+      <<: *flags
       - checkout
       - restore_cache:
           keys:
