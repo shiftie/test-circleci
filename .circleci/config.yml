@@ -3,18 +3,18 @@
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
 
-node: &node
-  docker:
-    - image: circleci/node:8.9.4
-  working_directory: ~/repo
-
-flags: &flags
-    run:
-      name: Setting build params
-      command: |
-        if [[ $CIRCLE_BRANCH = *"ster"* ]]; then
-          TOTO=tata
-        fi
+aliases:
+  - &node
+    docker:
+      - image: circleci/node:8.9.4
+    working_directory: ~/repo
+  - &flags
+      run:
+        name: Setting build params
+        command: |
+          if [[ $CIRCLE_BRANCH = *"ster"* ]]; then
+            TOTO=tata
+          fi
 
 version: 2
 jobs:
