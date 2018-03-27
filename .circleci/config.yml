@@ -11,7 +11,7 @@ node: &node
 flags: &flags
   - run:
       name: Setting build params
-      command: if [[ $CIRCLE_BRANCH = *"ster"* ]]; then TOTO=tata fi
+      command: echo gg
 
 version: 2
 jobs:
