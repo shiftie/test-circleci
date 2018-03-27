@@ -151,7 +151,19 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
-      - run: node .circleci/deploy.js $BUILD_PARAMS
+      - run: node scripts/deploy.js $BUILD_PARAMS
+
+  commitRecompile:
+    <<: *node
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+      - run: node scripts/mapper.js zen en --force --skip-content
+      - run: node scripts/commitRecompile.js
 
 workflows:
   version: 2
@@ -179,24 +191,32 @@ workflows:
           # LA working hours: 13.59-16.59 weekdays
           # cron: "59 20-23 * * 1-5"
           # UTC time
-          cron: "24 12-16 * * 1-5"
+          cron: "59 12-16 * * 1-5"
           filters:
             branches:
               only:
                 - master
     <<: *hourlyBuild
 
-  # daily:
-  #   triggers:
-  #     - schedule:
-  #         # UTC time, matches 3AM weekdays LA time
-  #         cron: "0 10 * * 1-5"
-  #         filters:
-  #           branches:
-  #             only:
-  #               - master
-  #   jobs:
-  #     - build
+  daily:
+    triggers:
+      - schedule:
+          # UTC time, matches 3AM weekdays LA time
+          cron: "0 16 * * 1-5"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - bootstrap:
+          filters:
+            branches:
+              only:
+                - master
+      - commitRecompile:
+          requires:
+            - bootstrap
+
   generate-and-list:
     jobs:
       - bootstrap:
