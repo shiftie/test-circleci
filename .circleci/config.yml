@@ -108,7 +108,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - public/sites # might improve here if too long to handle only modified files
+            - public/sites # might improve here, if too long, handle only modified files
 
   test:
     docker:
@@ -131,7 +131,9 @@ jobs:
       - run:
           name: Tests acceptance
           command: TESTFILES=$(circleci tests glob "test/acceptance/**/*.js" | circleci tests split --split-by=timings) && yarn run t ${TESTFILES} --parallel
-      - deploy: node .circleci/deploy.js $BUILD_PARAMS
+      - deploy:
+         name: Deploying
+         comment: node .circleci/deploy.js $BUILD_PARAMS
       - store_test_results:
           path: /tmp/test-results
 
