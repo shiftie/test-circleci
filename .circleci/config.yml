@@ -11,13 +11,14 @@ node: &node
 version: 2
 jobs:
   bootstrap:
-    <<: *node
-    steps:
-      - run: |
+    environment:
+      - TOTO: |
           if [[ $CIRCLE_BRANCH = *"aster"* ]]; then
             echo "It's there!"
             TOTO=tata
           fi
+    <<: *node
+    steps:
       - checkout
       - restore_cache:
           keys:
