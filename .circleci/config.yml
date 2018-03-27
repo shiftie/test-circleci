@@ -59,8 +59,10 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
       - run: node scripts/jobvite.js $BUILD_PARAMS
+      # TODO: apps.js has to also downloadAppsJson() currently done by normandy
       - run: node scripts/apps.js $BUILD_PARAMS
       - run: node scripts/uploadImages.js public/assets/images/p-apps-marketplace/apps/ $BUILD_PARAMS
+      # TODO: uncomment this once we're in real project
       # - persist_to_workspace:
       #     root: .
       #     paths:
@@ -97,6 +99,7 @@ jobs:
       - run: node scripts/mapper.js zen ja $BUILD_PARAMS
       - run: node scripts/mapper.js zen rl $BUILD_PARAMS
       - run: node scripts/mapper.js zen en $BUILD_PARAMS
+      # TODO: serialize bucket data into a file so we don't load bucket info several times
       - run: node scripts/compiler.js zen en $BUILD_PARAMS
       - run: node scripts/compiler.js zen ja $BUILD_PARAMS
       - run: node scripts/compiler.js zen rl $BUILD_PARAMS
@@ -105,7 +108,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - public/sites #might improve here if too long
+            - public/sites # might improve here if too long to handle only modified files
 
   test:
     docker:
