@@ -8,7 +8,7 @@ node: &node
     - image: circleci/node:8.9.4
   working_directory: ~/repo
 
-flags: &flags
+flagsz: &flagsz
   - run:
       name: Setting build params
       command: echo gg
@@ -18,7 +18,7 @@ jobs:
   bootstrap:
     <<: *node
     steps:
-      <<: *flags
+      <<: *flagsz
       - checkout
       - restore_cache:
           keys:
