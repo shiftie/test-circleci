@@ -40,19 +40,12 @@ hourlyBuild: &hourlyBuild
 version: 2
 jobs:
   bootstrap:
-    environment:
-      - TOTO: |
-          if [[ $CIRCLE_BRANCH = *"aster"* ]]; then
-            echo "It's there!"
-            TOTO=tata
-          fi
     <<: *node
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
-      - run: echo $TOTO
       - run: yarn install
       - save_cache:
           paths:
