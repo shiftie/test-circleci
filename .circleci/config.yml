@@ -9,16 +9,15 @@ node: &node
   working_directory: ~/repo
 
 flagsz: &flagsz
-  - run:
-      name: Setting build params
-      command: echo gg
+  docker:
+    - image: circleci/node:8.9.4
+  working_directory: ~/repo
 
 version: 2
 jobs:
   bootstrap:
-    <<: *node
+    <<: *flagsz
     steps:
-      <<: *flagsz
       - checkout
       - restore_cache:
           keys:
