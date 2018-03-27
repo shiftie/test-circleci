@@ -88,6 +88,8 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
@@ -126,21 +128,22 @@ jobs:
       - run:
           name: Tests acceptance
           command: TESTFILES=$(circleci tests glob "test/acceptance/**/*.js" | circleci tests split --split-by=timings) && yarn run t ${TESTFILES} --parallel
+      - deploy: node .circleci/deploy.js $BUILD_PARAMS
       - store_test_results:
           path: /tmp/test-results
 
-  deploy:
-    docker:
-      - image: circleci/node:8.9.4
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - attach_workspace:
-          at: .
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-      - run: node .circleci/deploy.js $BUILD_PARAMS
+  # deploy:
+  #   docker:
+  #     - image: circleci/node:8.9.4
+  #   working_directory: ~/repo
+  #   steps:
+  #     - checkout
+  #     - attach_workspace:
+  #         at: .
+  #     - restore_cache:
+  #         keys:
+  #           - v1-dependencies-{{ checksum "package.json" }}
+  #     - run: node .circleci/deploy.js $BUILD_PARAMS
 
 workflows:
   version: 2
@@ -233,7 +236,7 @@ workflows:
           context: mirror
           requires:
             - generate
-      - deploy:
-          context: mirror
-          requires:
-            - test
+      # - deploy:
+      #     context: mirror
+      #     requires:
+      #       - test
