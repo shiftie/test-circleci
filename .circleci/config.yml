@@ -2,17 +2,31 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
+
+node: &node
+  docker:
+    - image: circleci/node:8.9.4
+  working_directory: ~/repo
+
+buildFlags: &buildFlags
+    run:
+      name: Setting build params
+      command: |
+        if [[ $CIRCLE_BRANCH = *"ster"* ]]; then
+          TOTO=tata
+        fi
+
 version: 2
 jobs:
   bootstrap:
-    docker:
-      - image: circleci/node:8.9.4
-    working_directory: ~/repo
+    <<: *node
     steps:
+      <<: *buildFlags
       - checkout
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
+      - run: echo $TOTO
       - run: yarn install
       - save_cache:
           paths:
@@ -20,9 +34,7 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
   apps:
-    docker:
-      - image: circleci/node:8.9.4
-    working_directory: ~/repo
+    <<: *node
     steps:
       - checkout
       - restore_cache:
@@ -41,9 +53,7 @@ jobs:
       #       - wordpress/wp-content/themes/zendesk-twentyeleven/lib/apps.json
 
   build:
-    docker:
-      - image: circleci/node:8.9.4
-    working_directory: ~/repo
+    <<: *node
     steps:
       - checkout
       - restore_cache:
@@ -107,9 +117,7 @@ jobs:
           path: /tmp/test-results
 
   deploy:
-    docker:
-      - image: circleci/node:8.9.4
-    working_directory: ~/repo
+    <<: *node
     steps:
       - checkout
       - attach_workspace:
