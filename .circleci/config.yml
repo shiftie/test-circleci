@@ -18,7 +18,6 @@ jobs:
   bootstrap:
     <<: *node
     steps:
-      <<: *flags
       - checkout
       - restore_cache:
           keys:
