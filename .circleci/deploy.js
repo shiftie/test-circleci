@@ -7,4 +7,4 @@ This will :
   - Rebase local branch & commit / push to origin
   - Update DB to reflect compiled pages
   - Send Slack message
-`);
+with args: ${process.argv.slice(2)}`);

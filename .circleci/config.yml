@@ -49,24 +49,38 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-  build:
+  apps:
     docker:
       - image: circleci/node:8.9.4
     working_directory: ~/repo
-    parallelism: 3
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
+      - run: node scripts/jobvite.js $BUILD_PARAMS
+      - run: node scripts/apps.js $BUILD_PARAMS
+      - run: node scripts/uploadImages.js public/assets/images/p-apps-marketplace/apps/ $BUILD_PARAMS
+      # - persist_to_workspace:
+      #     root: .
+      #     paths:
+      #       - public/assets/json/jobs.json
+      #       - public/assets/json/jobs-search.json
+      #       - wordpress/wp-content/themes/zendesk-twentyeleven/lib/apps.json
+
+  build:
+    docker:
+      - image: circleci/node:8.9.4
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+      - run: node scripts/uploadImages.js public/assets/images/ $BUILD_PARAMS
       - run: sudo npm install -g grunt-cli
-      - run: BUILDTASKS=$(circleci tests split .circleci/jobs/build.txt) && ${BUILDTASKS} $BUILD_PARAMS
-      - persist_to_workspace:
-          root: .
-          paths:
-            - public/assets/json/jobs.json
-            - public/assets/json/jobs-search.json
-            - wordpress/wp-content/themes/zendesk-twentyeleven/lib/apps.json
+      - run: grunt zendesk-dist $BUILD_PARAMS
+      - run: node scripts/uploadDisted.js $BUILD_PARAMS
 
   generate:
     docker:
@@ -77,7 +91,15 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
-      - run: node .circleci/scripts/generate.js $BUILD_PARAMS
+      - run: node scripts/mapper.js zen en $BUILD_PARAMS
+      - run: node scripts/mapper.js zen ja $BUILD_PARAMS
+      - run: node scripts/mapper.js zen rl $BUILD_PARAMS
+      - run: node scripts/mapper.js zen en $BUILD_PARAMS
+      - run: node scripts/compiler.js zen en $BUILD_PARAMS
+      - run: node scripts/compiler.js zen ja $BUILD_PARAMS
+      - run: node scripts/compiler.js zen rl $BUILD_PARAMS
+      - run: node scripts/compiler.js zen en $BUILD_PARAMS
+      - run: node scripts/critical.js $BUILD_PARAMS
       - persist_to_workspace:
           root: .
           paths:
@@ -118,7 +140,7 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
-      - run: node .circleci/scripts/deploy.js $BUILD_PARAMS
+      - run: node .circleci/deploy.js $BUILD_PARAMS
 
 workflows:
   version: 2
@@ -189,12 +211,16 @@ workflows:
   generate-and-list:
     jobs:
       - bootstrap:
+        context: mirror
+        filters:
+          branches:
+            only:
+              - master
+              - /.*mp$/
+      - apps:
           context: mirror
-          filters:
-            branches:
-              only:
-                - master
-                - /.*mp$/
+          requires:
+            - bootstrap
       - build:
           context: mirror
           requires:

@@ -1,2 +1,0 @@
-node .circleci/scripts/updateApps.js
-node .circleci/scripts/compileAndUploadAssets.js
