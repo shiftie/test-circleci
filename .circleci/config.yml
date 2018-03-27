@@ -8,6 +8,35 @@ node: &node
     - image: circleci/node:8.9.4
   working_directory: ~/repo
 
+hourlyBuild: &hourlyBuild
+  jobs:
+    - bootstrap:
+        context: prod
+        filters:
+          branches:
+            only:
+              - master
+    - apps:
+        context: prod
+        requires:
+          - bootstrap
+    - build:
+        context: prod
+        requires:
+          - bootstrap
+    - generate:
+        context: prod
+        requires:
+          - build
+    - test:
+        context: prod
+        requires:
+          - generate
+    - deploy:
+        context: prod
+        requires:
+          - test
+
 version: 2
 jobs:
   bootstrap:
@@ -131,53 +160,31 @@ workflows:
   #         duplicating hourly workflow without shedule
   #         but adding cutom branch name to filters
   #
-  # hourly-AM:
-  #   triggers:
-  #     - schedule:
-  #         # LA working hours: 8.59-11.59 weekdays
-  #         # cron: "59 15-18 * * 1-5"
-  #         # UTC time
-  #         cron: "59 7-10 * * 1-5"
-  #         filters:
-  #           branches:
-  #             only:
-  #               - master
-  #   jobs:
-  #     - bootstrap
-  #     - generateA:
-  #         requires:
-  #           - bootstrap
-  #     - generateB:
-  #         requires:
-  #           - bootstrap
-  #     - list:
-  #         requires:
-  #           - generateA
-  #           # - generateB
+  hourly-AM:
+    triggers:
+      - schedule:
+          # LA working hours: 8.59-11.59 weekdays
+          # cron: "59 15-18 * * 1-5"
+          # UTC time
+          cron: "59 7-10 * * 1-5"
+          filters:
+            branches:
+              only:
+                - master
+    <<: *hourlyBuild
 
-  # hourly-PM:
-  #   triggers:
-  #     - schedule:
-  #         # LA working hours: 13.59-16.59 weekdays
-  #         # cron: "59 20-23 * * 1-5"
-  #         # UTC time
-  #         cron: "59 12-16 * * 1-5"
-  #         filters:
-  #           branches:
-  #             only:
-  #               - master
-  #   jobs:
-  #     - bootstrap
-  #     - generateA:
-  #         requires:
-  #           - bootstrap
-  #     - generateB:
-  #         requires:
-  #           - bootstrap
-  #     - list:
-  #         requires:
-  #           - generateA
-  #           # - generateB
+  hourly-PM:
+    triggers:
+      - schedule:
+          # LA working hours: 13.59-16.59 weekdays
+          # cron: "59 20-23 * * 1-5"
+          # UTC time
+          cron: "24 12-16 * * 1-5"
+          filters:
+            branches:
+              only:
+                - master
+    <<: *hourlyBuild
 
   # daily:
   #   triggers:
