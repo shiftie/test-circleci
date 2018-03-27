@@ -211,12 +211,12 @@ workflows:
   generate-and-list:
     jobs:
       - bootstrap:
-        context: mirror
-        filters:
-          branches:
-            only:
-              - master
-              - /.*mp$/
+          context: mirror
+          filters:
+            branches:
+              only:
+                - master
+                - /.*mp$/
       - apps:
           context: mirror
           requires:
