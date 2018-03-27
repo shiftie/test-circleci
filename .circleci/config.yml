@@ -134,6 +134,9 @@ jobs:
       - deploy:
          name: Deploying
          command: node .circleci/deploy.js $BUILD_PARAMS
+      - deploy:
+          name: test
+          command: echo YUP
       - store_test_results:
           path: /tmp/test-results
 
