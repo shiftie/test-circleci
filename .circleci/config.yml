@@ -11,10 +11,7 @@ aliases:
   - &flags
     run:
       name: Setting build params
-      command: |
-        if [[ $CIRCLE_BRANCH = *"ster"* ]]; then
-          TOTO=tata
-        fi
+      command: if [[ $CIRCLE_BRANCH = *"ster"* ]]; then TOTO=tata fi
 
 version: 2
 jobs:
