@@ -199,8 +199,7 @@ workflows:
                 - master
                 - /.*mp$/
       - apps:
-          context:
-            - mirror
+          context: mirror
           requires:
             - bootstrap
       - build:
