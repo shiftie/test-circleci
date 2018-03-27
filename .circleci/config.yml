@@ -205,7 +205,6 @@ workflows:
       - apps:
           context:
             - mirror
-            - prod
           requires:
             - bootstrap
       - build:
