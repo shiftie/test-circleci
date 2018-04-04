@@ -165,50 +165,50 @@ workflows:
   #         duplicating hourly workflow without shedule
   #         but adding cutom branch name to filters
   #
-  hourly-AM:
-    triggers:
-      - schedule:
-          # LA working hours: 8.59-11.59 weekdays
-          # cron: "59 15-18 * * 1-5"
-          # UTC time
-          cron: "59 7-10 * * 1-5"
-          filters:
-            branches:
-              only:
-                - master
-    <<: *hourlyBuild
+  # hourly-AM:
+  #   triggers:
+  #     - schedule:
+  #         # LA working hours: 8.59-11.59 weekdays
+  #         # cron: "59 15-18 * * 1-5"
+  #         # UTC time
+  #         cron: "59 7-10 * * 1-5"
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
+  #   <<: *hourlyBuild
 
-  hourly-PM:
-    triggers:
-      - schedule:
-          # LA working hours: 13.59-16.59 weekdays
-          # cron: "59 20-23 * * 1-5"
-          # UTC time
-          cron: "59 12-16 * * 1-5"
-          filters:
-            branches:
-              only:
-                - master
-    <<: *hourlyBuild
+  # hourly-PM:
+  #   triggers:
+  #     - schedule:
+  #         # LA working hours: 13.59-16.59 weekdays
+  #         # cron: "59 20-23 * * 1-5"
+  #         # UTC time
+  #         cron: "59 12-16 * * 1-5"
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
+  #   <<: *hourlyBuild
 
-  daily:
-    triggers:
-      - schedule:
-          # UTC time, matches 3AM weekdays LA time
-          cron: "0 16 * * 1-5"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - bootstrap:
-          filters:
-            branches:
-              only:
-                - master
-      - commitRecompile:
-          requires:
-            - bootstrap
+  # daily:
+  #   triggers:
+  #     - schedule:
+  #         # UTC time, matches 3AM weekdays LA time
+  #         cron: "0 16 * * 1-5"
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
+  #   jobs:
+  #     - bootstrap:
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
+  #     - commitRecompile:
+  #         requires:
+  #           - bootstrap
 
   mirror-build:
     jobs:
